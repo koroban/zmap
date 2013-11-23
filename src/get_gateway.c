@@ -13,31 +13,7 @@
 #include <errno.h>
 #include <assert.h>
 
-#include "../lib/logger.h"
-
-#ifndef __FAVOR_BSD
-#define __FAVOR_BSD
-
-#endif
-#ifndef __USE_BSD
-#define __USE_BSD
-#endif
-
-
-#include <sys/types.h>
-#include <sys/socket.h>
-
-#include <netinet/in.h>
-#include <netinet/ip.h>
-#include <netinet/udp.h>
-#include <netinet/tcp.h>
-#include <net/ethernet.h>
-
-#include <netdb.h>
-#include <net/if.h>
-#include <ifaddrs.h>
-#include <arpa/inet.h>
-
+#include "../lib/includes.h"
 #include "../lib/logger.h"
 
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__)
