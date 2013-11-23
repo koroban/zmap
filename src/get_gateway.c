@@ -13,16 +13,7 @@
 #include <errno.h>
 #include <assert.h>
 
-#include <netinet/in.h>
-#include <net/if.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#include <linux/netlink.h>
-#include <linux/rtnetlink.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-
+#include "../lib/includes.h"
 #include "../lib/logger.h"
 
 int read_nl_sock(int sock, char *buf, int buf_len)
