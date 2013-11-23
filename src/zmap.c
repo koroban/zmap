@@ -75,6 +75,12 @@ static void split_string(char* in, int *len, char***results)
         *len = retvlen;
 }
 
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__)
+static void set_cpu(void)
+{
+	log_warning("zmap", "set_cpu is not yet defined for BSD");
+}
+#else
 static void set_cpu(void)
 {
 	pthread_mutex_lock(&cpu_affinity_mutex);
@@ -91,7 +97,8 @@ static void set_cpu(void)
 			pthread_self(), core);
 	core = (core + 1) % num_cores;
 	pthread_mutex_unlock(&cpu_affinity_mutex);
-}	
+}
+#endif
 
 static void* start_send(void *arg)
 {
