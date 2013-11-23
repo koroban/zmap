@@ -25,6 +25,8 @@
 #include "../lib/logger.h"
 #include "../lib/random.h"
 
+#include <mach/thread_act.h>
+
 #include "zopt.h"
 #include "send.h"
 #include "recv.h"
@@ -81,13 +83,28 @@ static void set_cpu(void)
 	pthread_mutex_lock(&cpu_affinity_mutex);
 	static int core=0;
 	int num_cores = sysconf(_SC_NPROCESSORS_ONLN);
-	cpu_set_t cpuset;	
-	CPU_ZERO(&cpuset);
-	CPU_SET(core, &cpuset);
+	/*
+	//cpu_set_t cpuset;	
+	//CPU_ZERO(&cpuset);
+	//CPU_SET(core, &cpuset);
+
 	if (pthread_setaffinity_np(pthread_self(),
 				sizeof(cpu_set_t), &cpuset) != 0) {
 		log_error("zmap", "can't set thread CPU affinity");
 	}
+	log_trace("zmap", "set thread %u affinity to core %d",
+			pthread_self(), core);
+	core = (core + 1) % num_cores;
+	*/
+	mach_port_t tid = pthread_mach_thread_np(pthread_self());
+	struct thread_affinity_policy policy;
+	policy.affinity_tag = core;
+	thread_policy_set(
+					tid,
+					THREAD_AFFINITY_POLICY,
+					(thread_policy_t) &policy,
+					THREAD_AFFINITY_POLICY_COUNT
+	);
 	log_trace("zmap", "set thread %u affinity to core %d",
 			pthread_self(), core);
 	core = (core + 1) % num_cores;
