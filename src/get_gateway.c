@@ -63,7 +63,6 @@ int get_hw_addr(struct in_addr *gw_ip, char *iface, unsigned char *hw_mac)
 #include <linux/rtnetlink.h>
 #include <arpa/inet.h>
 
->>>>>>> compilable version of get_gateway.c with implemented get ip and mocked others.
 int read_nl_sock(int sock, char *buf, int buf_len)
 {
 	int msg_len = 0;
