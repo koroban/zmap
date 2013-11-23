@@ -13,9 +13,80 @@
 #include <errno.h>
 #include <assert.h>
 
-#include "../lib/includes.h"
 #include "../lib/logger.h"
 
+#ifndef __FAVOR_BSD
+#define __FAVOR_BSD
+
+#endif
+#ifndef __USE_BSD
+#define __USE_BSD
+#endif
+
+#include <sys/types.h>
+#include <sys/socket.h>
+
+#include <netinet/in.h>
+#include <netinet/ip.h>
+#include <netinet/udp.h>
+#include <netinet/tcp.h>
+#include <net/ethernet.h>
+
+#include <netdb.h>
+#include <net/if.h>
+#include <ifaddrs.h>
+#include <arpa/inet.h>
+
+#include "../lib/logger.h"
+
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__)
+
+int get_iface_ip(char *iface, struct in_addr *ip)
+{
+    assert(iface);
+    struct ifaddrs *ifaddr, *ifa;
+    if (getifaddrs(&ifaddr)) {
+        log_fatal("get-iface-ip", "unable able to retrieve list of network interfaces: %s",
+                        strerror(errno));
+    }   
+    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+        if (ifa->ifa_addr == NULL || ifa->ifa_addr->sa_family != AF_INET) {
+            continue;
+        }   
+        if (!strcmp(iface, ifa->ifa_name)) {
+            struct sockaddr_in *sin = (struct sockaddr_in *)ifa->ifa_addr;
+            ip->s_addr = sin->sin_addr.s_addr;
+            log_debug("get-iface-ip", "ip address found for %s: %s",
+                            iface, inet_ntoa(*ip));
+            return EXIT_SUCCESS;
+        }   
+    }   
+    log_fatal("get-iface-ip", "specified interface does not"
+                    " exist or have an IPv4 address"); 
+    return EXIT_FAILURE;
+}
+
+int get_default_gw(struct in_addr *gw, char *iface)
+{
+	log_warn("get-default-gw", "not yet implemented on bsd");
+	return EXIT_FAILURE;
+}	
+
+
+int get_hw_addr(struct in_addr *gw_ip, char *iface, unsigned char *hw_mac)
+{
+	log_warn("get-default-gw", "not yet implemented on bsd");
+	return EXIT_FAILURE;
+}
+
+#else // (linux)
+
+#include <sys/ioctl.h>
+#include <linux/netlink.h>
+#include <linux/rtnetlink.h>
+#include <arpa/inet.h>
+
+>>>>>>> compilable version of get_gateway.c with implemented get ip and mocked others.
 int read_nl_sock(int sock, char *buf, int buf_len)
 {
 	int msg_len = 0;
@@ -215,26 +286,24 @@ int get_default_gw(struct in_addr *gw, char *iface)
 	return -1;
 }
 
-// Returns the first IP address for a given iface
 int get_iface_ip(char *iface, struct in_addr *ip)
 {
 	int sock;
 	struct ifreq ifr;
 	sock = socket(AF_INET, SOCK_DGRAM, 0);
 	if (sock < 0) {
-		log_error("get-gw", "failure opening socket: %s", strerror(errno));
-		return -1;
+		log_fatal("get-iface-ip", "failure opening socket: %s", strerror(errno));
 	}
 	ifr.ifr_addr.sa_family = AF_INET;
 	strncpy(ifr.ifr_name, iface, IFNAMSIZ-1);
 
 	if (ioctl(sock, SIOCGIFADDR, &ifr) < 0) {
-		log_error("get-gw", "ioctl failure: %s", strerror(errno));
+		log_fatal("get-iface-ip", "ioctl failure: %s", strerror(errno));
 		close(sock);
-		return -1;
 	}
+	ip->s_addr =  &((struct sockaddr_in*)&ifr.ifr_addr)->sin_addr.s_addr;
 	close(sock);
-	memcpy(ip, &((struct sockaddr_in*)&ifr.ifr_addr)->sin_addr, sizeof(*ip));
-	return 0;
+	return EXIT_SUCCESS;
 }
 
+#endif // end linux
