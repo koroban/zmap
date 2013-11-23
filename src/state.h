@@ -8,10 +8,8 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include <netinet/ip.h>
-#include <netinet/tcp.h>
-#include <netinet/ether.h>
-#include <net/if.h>
+
+#include "../lib/includes.h"
 
 #include "types.h"
 #include "fieldset.h"

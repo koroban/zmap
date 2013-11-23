@@ -15,14 +15,7 @@
 #include <unistd.h>
 #include <string.h>
 
-#include <netinet/ether.h>
-#include <netinet/ip.h>
-#include <netinet/ip_icmp.h>
-
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-
+#include "../../lib/includes.h"
 #include "probe_modules.h"
 #include "../fieldset.h"
 #include "packet.h"

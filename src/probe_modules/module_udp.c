@@ -15,15 +15,7 @@
 #include <string.h>
 #include <assert.h>
 
-#include <netinet/udp.h>
-#include <netinet/ip.h>
-#include <netinet/ether.h>
-#include <netinet/ip_icmp.h>
-
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-
+#include "../../lib/includes.h"
 #include "probe_modules.h"
 #include "packet.h"
 #include "logger.h"

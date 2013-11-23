@@ -15,14 +15,7 @@
 #include <string.h>
 #include <assert.h>
 
-#include <netinet/ip.h>
-#include <netinet/tcp.h>
-#include <netinet/ether.h>
-
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-
+#include "../../includes.h"
 #include "../fieldset.h"
 #include "probe_modules.h"
 #include "packet.h"
