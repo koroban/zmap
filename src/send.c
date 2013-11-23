@@ -18,12 +18,7 @@
 #include <errno.h>
 #include <assert.h>
 
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#include <net/if.h>
-#include <linux/if_packet.h>
-
+#include "../lib/includes.h"
 #include "../lib/logger.h"
 #include "../lib/random.h"
 #include "../lib/blacklist.h"

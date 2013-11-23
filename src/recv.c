@@ -11,24 +11,12 @@
 #include <string.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <assert.h>
 
 #include <pcap.h>
 #include <pcap/pcap.h>
 
-#include <netinet/tcp.h>
-#include <netinet/ip_icmp.h>
-#include <netinet/udp.h>
-#include <netinet/ip.h>
-#include <netinet/in.h>
-
-#include <linux/if_ether.h>
-#include <arpa/inet.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#include <net/if.h>
-#include <assert.h>
-
+#include "../lib/includes.h"
 #include "../lib/logger.h"
 #include "../lib/pbm.h"
 

@@ -12,12 +12,7 @@
 #include <time.h>
 #include <sys/time.h>
 
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#include <net/if.h>
-#include <linux/if_packet.h>
-
+#include "../../lib/includes.h"
 #include "../../lib/logger.h"
 #include "../fieldset.h"
 #include "probe_modules.h"

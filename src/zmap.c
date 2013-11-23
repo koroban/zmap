@@ -15,18 +15,13 @@
 #include <assert.h>
 #include <sched.h>
 #include <errno.h>
-
 #include <pwd.h>
-#include <net/if.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/types.h>
 
 #include <pcap/pcap.h>
 
 #include <pthread.h>
 
+#include "../lib/includes.h"
 #include "../lib/logger.h"
 #include "../lib/random.h"
 

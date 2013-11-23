@@ -11,16 +11,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
-#include <netinet/ether.h>
-#include <netinet/ip.h>
-#include <netinet/tcp.h>
-#include <netinet/udp.h>
-#include <netinet/ip_icmp.h>
-
-#include <net/if.h>
-#include <arpa/inet.h>
 #include <assert.h>
+
+#include "../lib/includes.h"
 
 #include "state.h"
 
