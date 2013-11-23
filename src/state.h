@@ -19,6 +19,7 @@
 #define STATE_H
 
 #define MAX_PACKET_SIZE 4096
+#define MAC_ADDR_LEN_BYTES 6
 
 struct probe_module;
 struct output_module;
@@ -68,7 +69,7 @@ struct state_conf {
 	struct output_module *output_module;
 	char *probe_args;
 	char *output_args;
-	macaddr_t gw_mac[IFHWADDRLEN];
+	macaddr_t gw_mac[MAC_ADDR_LEN_BYTES];
 	int gw_mac_set;
 	int send_ip_pkts;
 	char *source_ip_first;
