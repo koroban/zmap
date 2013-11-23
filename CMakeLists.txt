@@ -15,7 +15,7 @@ if(ENABLE_DEVELOPMENT)
 		"-Wextra"
 		"-Wfloat-equal -Wundef -Wwrite-strings -Wredundant-decls"
 		"-Wnested-externs -Wbad-function-cast -Winit-self"
-		"-Wmissing-noreturn -Wnormalized=id"
+		"-Wmissing-noreturn"
 		"-Wstack-protector"
 		"-Werror"
 		)
