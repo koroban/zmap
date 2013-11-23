@@ -20,10 +20,22 @@ if(ENABLE_DEVELOPMENT)
 		"-Werror"
 		)
 
+	set(CLANGWARNINGS 
+		"-Wall -Wformat=2 -Wno-format-nonliteral"
+		"-pedantic -fno-strict-aliasing"
+		"-Wextra"
+		"-Wfloat-equal -Wundef -Wwrite-strings -Wredundant-decls"
+		"-Wnested-externs -Wbad-function-cast -Winit-self"
+		"-Wmissing-noreturn"
+		"-Wstack-protector"
+		"-Werror"
+		)
+
 	# Fix line breaks
 	string(REPLACE ";" " "  GCCWARNINGS "${GCCWARNINGS}")
+	string(REPLACE ";" " "  CLANGWARNINGS "${CLANGWARNINGS}")
 
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${GCCWARNINGS} -g")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CLANGWARNINGS} -g")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -g")
 endif()
 
