@@ -209,16 +209,10 @@ static void start_zmap(void)
 {
 	log_info("zmap", "started");
 	if (zconf.iface == NULL) {
-		char errbuf[PCAP_ERRBUF_SIZE];
-		char *iface = pcap_lookupdev(errbuf);
-		if (iface == NULL) {
-			log_fatal("zmap", "could not detect default network interface "
-					"(e.g. eth0). Try running as root or setting"
-					" interface using -i flag.");
-		}
+		zconf.iface = get_default_iface();
+		assert(zconf.iface);
 		log_debug("zmap", "no interface provided. will use default"
-				" interface (%s).", iface);
-		zconf.iface = iface;
+				" interface (%s).", zconf.iface);
 	}
 	if (zconf.source_ip_first == NULL) {
 		struct in_addr default_ip;
@@ -241,7 +235,7 @@ static void start_zmap(void)
 					zconf.iface);
 		}
 		log_debug("zmap", "found gateway IP %s on %s", inet_ntoa(gw_ip), iface); 
-		if (get_hw_addr(&gw_ip, iface, zconf.gw_mac) < 0) {
+		if (get_hw_addr(&gw_ip, zconf.gw_mac) < 0) {
 			log_fatal("zmap", "could not detect GW MAC address for %s on %s."
 					" Try setting default gateway mac address (-G).",
 					inet_ntoa(gw_ip), zconf.iface);

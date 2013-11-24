@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <assert.h>
+#include <string.h>
 
 #include <sys/socket.h>
 #include <net/route.h>
@@ -24,7 +25,7 @@
 
 #define UNUSED __attribute__((unused))
 
-int get_hw_addr(struct in_addr *gw_ip, UNUSED char *iface, unsigned char *hw_mac)
+int get_hw_addr(struct in_addr *gw_ip, unsigned char *hw_mac)
 {
 	int rc = 0;
 	arp_t *arp;
@@ -102,14 +103,12 @@ int get_iface_ip(char *iface, struct in_addr *ip)
     return EXIT_FAILURE;
 }
 
-int get_default_gw(struct in_addr *gw, char *iface)
+int _get_default_gw(struct in_addr *gw, char **iface)
 {
-	int seq = 0x00FF;
 	char buf[4096];
 	struct rt_msghdr *rtm = (struct rt_msghdr*) &buf;
-	int fd = socket(PF_ROUTE, SOCK_RAW, 0);
-
 	memset(rtm, 0, sizeof(buf));
+	int seq = 0x00FF;
 	rtm->rtm_msglen = sizeof(buf);
 	rtm->rtm_type = RTM_GET;
 	rtm->rtm_flags = RTF_GATEWAY;
@@ -118,6 +117,8 @@ int get_default_gw(struct in_addr *gw, char *iface)
 	rtm->rtm_addrs = RTA_DST | RTA_IFP;
 	rtm->rtm_pid = getpid();
 
+	int fd = socket(PF_ROUTE, SOCK_RAW, 0);
+	assert (fd > 0);
 	if (!write(fd, (char*) rtm, sizeof(buf))) {
 		log_fatal("get-gateway", "unable to send request");	
 	}
@@ -144,12 +145,11 @@ int get_default_gw(struct in_addr *gw, char *iface)
 				if (!sdl) {
 					log_fatal("get-gateway", "fuck");
 				}
-				if (memcmp(iface, sdl->sdl_data, sdl->sdl_nlen) != 0) {
-					log_fatal("get-gateway", "interface specified (%s) does not match "
-							"the interface of the default gateway (%.*s). You will need "
-							"to manually specify the MAC address of your dateway.",
-							iface, sdl->sdl_nlen, sdl->sdl_data);	
-				}
+				char *_iface = malloc(sdl->sdl_nlen+1);
+				assert(_iface);
+				memcpy(_iface, sdl->sdl_data, sdl->sdl_nlen);
+				_iface[sdl->sdl_nlen+1] = 0;
+				*iface = _iface;
 			}
 			if ((1<<i) == RTA_GATEWAY) {
 				struct sockaddr_in *sin = (struct sockaddr_in *) sa;
@@ -161,8 +161,28 @@ int get_default_gw(struct in_addr *gw, char *iface)
 	}
 	close(fd);
 	return EXIT_SUCCESS;
-}	
+}
 
+char* get_default_iface(void)
+{
+	struct in_addr t;
+	char *retv = NULL;
+	_get_default_gw(&t, &retv);
+	return retv;
+}
+
+int get_default_gw(struct in_addr *gw, char *iface)
+{
+	char** iface_ = &iface;
+	_get_default_gw(gw, iface_);
+	if (strcmp(*iface_, iface) != 0) {
+		log_fatal("get-gateway", "interface specified (%s) does not match "
+				"the interface of the default gateway (%s). You will need "
+				"to manually specify the MAC address of your dateway.",
+				*iface_);	
+	}
+	return EXIT_SUCCESS;
+}
 
 #else // (linux)
 
@@ -171,6 +191,17 @@ int get_default_gw(struct in_addr *gw, char *iface)
 #include <linux/rtnetlink.h>
 #include <arpa/inet.h>
 
+char *get_default_iface(void)
+{
+	char errbuf[PCAP_ERRBUF_SIZE];
+	char *iface = pcap_lookupdev(errbuf);
+	if (iface == NULL) {
+		log_fatal("zmap", "could not detect default network interface "
+				"(e.g. eth0). Try running as root or setting"
+				" interface using -i flag.");
+	}
+	return iface;
+}
 
 int read_nl_sock(int sock, char *buf, int buf_len)
 {
