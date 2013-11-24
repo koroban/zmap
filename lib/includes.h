@@ -5,7 +5,7 @@
 #define __USE_BSD
 #endif
 
-#ifdef __LINUX__
+#ifdef __linux__
 #include <dumbnet.h>
 #else
 #include <dnet.h>
