@@ -310,7 +310,7 @@ int get_iface_ip(char *iface, struct in_addr *ip)
 		log_fatal("get-iface-ip", "ioctl failure: %s", strerror(errno));
 		close(sock);
 	}
-	ip->s_addr =  &((struct sockaddr_in*)&ifr.ifr_addr)->sin_addr.s_addr;
+	ip->s_addr =  ((struct sockaddr_in*) &ifr.ifr_addr)->sin_addr.s_addr;
 	close(sock);
 	return EXIT_SUCCESS;
 }
