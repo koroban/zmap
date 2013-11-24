@@ -30,7 +30,6 @@
 #include "validate.h"
 
 // OS specific functions called by send_run
-static inline int send_get_src_macaddr(int fd, struct ifreq *if_mac);
 static inline int send_packet(int fd, void *buf, int len);
 static inline int send_run_init(int sock);
 
@@ -182,20 +181,11 @@ int send_run(int sock)
 
 	// Get the source hardware address, and give it to the probe
 	// module
-	struct ifreq if_mac;
-	if (!send_get_src_macaddr(sock, &if_mac)) {
-		return -1;
-	}
-#ifdef __LINUX__
-	zconf.probe_module->thread_initialize(buf, 
-			(unsigned char *) if_mac.ifr_hwaddr.sa_data, 
-			zconf.gw_mac, zconf.target_port);
-#else
-	zconf.probe_module->thread_initialize(buf, 
-			(unsigned char *) if_mac.ifr_addr.sa_data, 
-			zconf.gw_mac, zconf.target_port);
-#endif /* __LINUX__ */
+	unsigned char *hw_mac = malloc(ETHER_ADDR_LEN);
+	// TODO
 
+	zconf.probe_module->thread_initialize(buf, hw_mac, zconf.gw_mac,
+					      zconf.target_port);
 	pthread_mutex_unlock(&send_mutex);
 
 	

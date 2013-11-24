@@ -21,18 +21,6 @@ int get_socket(void)
 	return sock;
 }
 
-int send_get_src_macaddr(int sock, struct ifreq *if_mac)
-{
-	// get source interface mac
-	memset(if_mac, 0, sizeof(struct ifreq));
-	strncpy(if_mac->ifr_name, zconf.iface, IFNAMSIZ-1);
-	if (ioctl(sock, SIOCGIFHWADDR, &if_mac) < 0) {
-		perror("SIOCGIFHWADDR");
-		return 0;
-	}
-	return 1;
-}
-
 int send_run_init(int sock)
 {
 	// get source interface index
