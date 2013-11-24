@@ -24,6 +24,7 @@
 #include "../lib/blacklist.h"
 
 #include "cyclic.h"
+#include "get_gateway.h"
 #include "state.h"
 #include "probe_modules/packet.h"
 #include "probe_modules/probe_modules.h"
@@ -175,14 +176,18 @@ int send_run(int sock)
 	memset(buf, 0, MAX_PACKET_SIZE);
 
 	// OS specific per-thread init
-	if (!send_run_init(sock)) {
+	if (send_run_init(sock)) {
 		return -1;
 	}
 
 	// Get the source hardware address, and give it to the probe
 	// module
-	unsigned char *hw_mac = malloc(ETHER_ADDR_LEN);
-	// TODO
+	unsigned char hw_mac[ETHER_ADDR_LEN];
+	if (get_iface_hw_addr(zconf.iface, hw_mac)) {
+		log_error("send", "Couldn't get hardware address for"
+			  "interface: %s", zconf.iface);
+		return -1;
+	}
 
 	zconf.probe_module->thread_initialize(buf, hw_mac, zconf.gw_mac,
 					      zconf.target_port);

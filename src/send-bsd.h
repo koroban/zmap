@@ -52,7 +52,7 @@ int get_socket(void)
 int send_run_init(UNUSED int sock)
 {
 	// Don't need to do anything on BSD-like variants
-	return 1;
+	return EXIT_SUCCESS;
 }
 
 int send_packet(int fd, void *buf, int len)
