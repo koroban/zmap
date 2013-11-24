@@ -73,6 +73,8 @@ int get_iface_hw_addr(char *iface, unsigned char *hw_mac)
 
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__)
 
+#include <net/route.h>
+#include <net/if.h>
 #include <net/if_dl.h>
 
 int get_iface_ip(char *iface, struct in_addr *ip)
