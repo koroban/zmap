@@ -12,7 +12,6 @@ SET(LIB_SOURCES
 	${PROJECT_SOURCE_DIR}/lib/pbm.c
 	${PROJECT_SOURCE_DIR}/lib/random.c
 	${PROJECT_SOURCE_DIR}/lib/rijndael-alg-fst.c
-	${PROJECT_SOURCE_DIR}/lib/stack.c
 	${PROJECT_SOURCE_DIR}/lib/xalloc.c
 )
 
