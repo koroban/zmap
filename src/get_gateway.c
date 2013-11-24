@@ -16,8 +16,10 @@
 #include "../lib/includes.h"
 #include "../lib/logger.h"
 
-#define UNUSED __attribute__((unused))
+#define ROUNDUP(a) ((a) > 0 ? (1 + (((a) - 1) | (sizeof(int) - 1))) : sizeof(int))
 
+
+#define UNUSED __attribute__((unused))
 
 int get_hw_addr(struct in_addr *gw_ip, UNUSED char *iface, unsigned char *hw_mac)
 {
@@ -70,6 +72,14 @@ int get_iface_hw_addr(char *iface, unsigned char *hw_mac)
 
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__)
 
+#include <unistd.h>
+#include <sys/socket.h>
+#include <net/route.h>
+#include <netinet/in.h>
+#include <net/if_dl.h>
+#include <ctype.h>
+
+
 int get_iface_ip(char *iface, struct in_addr *ip)
 {
     assert(iface);
@@ -95,10 +105,69 @@ int get_iface_ip(char *iface, struct in_addr *ip)
     return EXIT_FAILURE;
 }
 
-int get_default_gw(UNUSED struct in_addr *gw, UNUSED char *iface)
+int get_default_gw(struct in_addr *gw, char *iface)
 {
-	log_warn("get-default-gw", "not yet implemented on bsd");
-	return EXIT_FAILURE;
+	int seq = 0x00FF;
+	char buf[4096];
+	//size_t sizeof_buffer = sizeof(struct rt_msghdr) + sizeof(struct sockaddr_in)*16;
+	struct rt_msghdr *rtm = (struct rt_msghdr*) &buf; //malloc(sizeof_buffer);
+	assert(rtm);
+
+	int fd = socket(PF_ROUTE, SOCK_RAW, 0);
+
+	memset(rtm, 0, sizeof(buf));
+	rtm->rtm_msglen = sizeof(buf);
+	rtm->rtm_type = RTM_GET;
+	rtm->rtm_flags = RTF_GATEWAY;
+	rtm->rtm_version = RTM_VERSION;
+	rtm->rtm_seq = seq;
+	rtm->rtm_addrs = RTA_DST | RTA_IFP;
+	rtm->rtm_pid = getpid();
+
+	if (!write(fd, (char*) rtm, sizeof(buf))) {
+		log_fatal("get-gateway", "unable to send request");	
+	}
+
+	size_t len;
+	while (rtm->rtm_type == RTM_GET && (len = read(fd, rtm, sizeof(buf))) > 0) {
+		if (len < (int)sizeof(*rtm)) {
+			return (-1);
+		}
+		if (rtm->rtm_type == RTM_GET && rtm->rtm_pid == getpid() && rtm->rtm_seq == seq) {
+			if (rtm->rtm_errno) {
+				errno = rtm->rtm_errno;
+				return (-1);
+			}
+			break;
+		}
+	}
+
+	struct sockaddr *sa = (struct sockaddr *)(rtm + 1);
+	for (int i = 0; i < RTAX_MAX; i++) {
+		if (rtm->rtm_addrs & (1 << i)) {
+			if ((1<<i) == RTA_IFP) {
+				struct sockaddr_dl *sdl = (struct sockaddr_dl *) sa;
+				if (!sdl) {
+					log_fatal("get-gateway", "fuck");
+				}
+				if (memcmp(iface, sdl->sdl_data, sdl->sdl_nlen) != 0) {
+					log_fatal("get-gateway", "interface specified does not match "
+							"the interface of the default gateway. You will need "
+							"to manually specify the MAC address of your dateway.");	
+				}
+			}
+			if ((1<<i) == RTA_GATEWAY) {
+				struct sockaddr_in *sin = (struct sockaddr_in *) sa;
+				printf("ip address is %s\n", inet_ntoa(sin->sin_addr));
+			}
+			// next element
+			sa = (struct sockaddr *)(ROUNDUP(sa->sa_len) + (char *)sa);
+		}
+	}
+	close(fd);
+	free(rtm);
+
+	return EXIT_SUCCESS;
 }	
 
 
