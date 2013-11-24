@@ -25,7 +25,9 @@
 #include "../lib/logger.h"
 #include "../lib/random.h"
 
+#ifndef __linux__
 #include <mach/thread_act.h>
+#endif
 
 #include "zopt.h"
 #include "send.h"

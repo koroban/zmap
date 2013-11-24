@@ -1,14 +1,14 @@
+#ifdef __linux__
+#include <dumbnet.h>
+#else
+#include <dnet.h>
+#endif
+
 #ifndef __FAVOR_BSD
 #define __FAVOR_BSD
 #endif
 #ifndef __USE_BSD
 #define __USE_BSD
-#endif
-
-#ifdef __linux__
-#include <dumbnet.h>
-#else
-#include <dnet.h>
 #endif
 
 #include <netinet/in.h>
