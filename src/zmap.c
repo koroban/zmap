@@ -526,7 +526,7 @@ int main(int argc, char *argv[])
 	if (args.vpn_given) {
 		zconf.send_ip_pkts = 1;
 		zconf.gw_mac_set = 1;
-		memset(zconf.gw_mac, 0, IFHWADDRLEN);
+		memset(zconf.gw_mac, 0, MAC_LEN);
 	}
 	if (cmdline_parser_required(&args, CMDLINE_PARSER_PACKAGE) != 0) {
 		exit(EXIT_FAILURE);
