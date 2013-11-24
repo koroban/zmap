@@ -236,8 +236,9 @@ static void start_zmap(void)
 					" Try setting default gateway mac address (-G).",
 					zconf.iface);
 		}
-		log_debug("zmap", "found gateway IP %s on %s", inet_ntoa(gw_ip), iface); 
-		if (get_hw_addr(&gw_ip, zconf.gw_mac) < 0) {
+		log_debug("zmap", "found gateway IP %s on %s", inet_ntoa(gw_ip), zconf.iface); 
+		
+		if (get_hw_addr(&gw_ip, zconf.gw_mac)) {
 			log_fatal("zmap", "could not detect GW MAC address for %s on %s."
 					" Try setting default gateway mac address (-G).",
 					inet_ntoa(gw_ip), zconf.iface);

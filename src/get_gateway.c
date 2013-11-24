@@ -32,12 +32,12 @@ int get_hw_addr(struct in_addr *gw_ip, unsigned char *hw_mac)
 	struct arp_entry entry;
 
 	if (!gw_ip || !hw_mac) {
-		return -1;
+		return EXIT_FAILURE;
 	}
 
 	if ((arp = arp_open()) == NULL) {
 		log_fatal("get_hw_addr", "failed to open arp table");
-		return -1;
+		return EXIT_FAILURE;
 	}
 	
 	// Convert gateway ip to dnet struct format
@@ -48,17 +48,14 @@ int get_hw_addr(struct in_addr *gw_ip, unsigned char *hw_mac)
 	
 	if (arp_get(arp, &entry) < 0) {
 		log_fatal("get_hw_addr", "failed to fetch arp entry");
-		rc = -1;
-		goto cleanup;
 	} else {
-		log_debug("get_hw_addr", "found ip %s at hw_addr %s", addr_ntoa(&entry.arp_pa),
+		log_debug("get_hw_addr", "found ip %s at hw_addr %s",
+			addr_ntoa(&entry.arp_pa),
 			addr_ntoa(&entry.arp_ha));
-		memcpy(hw_mac, &entry.arp_ha, 6);
+		memcpy(hw_mac, &entry.arp_ha.addr_eth, 6);
 	}
-
-cleanup:
 	arp_close(arp);
-	return rc;
+	return EXIT_SUCCESS;
 }
 
 int get_iface_hw_addr(char *iface, unsigned char *hw_mac)
