@@ -86,7 +86,7 @@ add_executable(zmap ${SOURCES})
 
 target_link_libraries(
 	zmap 
-	pcap gmp m
+	pcap gmp m dumbnet
 	${REDIS_LIBS}
 	${JSON_LIBRARIES}
 	)
