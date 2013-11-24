@@ -55,12 +55,6 @@ int send_run_init(UNUSED int sock)
 	return 1;
 }
 
-int send_get_src_macaddr(UNUSED int fd, UNUSED struct ifreq *if_mac)
-{
-	// TODO
-	return 0;
-}
-
 int send_packet(int fd, void *buf, int len)
 {
 	return write(fd, buf, len);

@@ -357,7 +357,7 @@ static int file_exists(char *name)
 	return 1;
 }
 
-#define MAC_LEN IFHWADDRLEN
+#define MAC_LEN ETHER_ADDR_LEN
 int parse_mac(macaddr_t *out, char *in)
 {
 	if (strlen(in) < MAC_LEN*3-1)
