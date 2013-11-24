@@ -53,6 +53,18 @@ cleanup:
 	return rc;
 }
 
+int get_iface_hw_addr(char *iface, unsigned char *hw_mac)
+{
+	eth_t *e = eth_open(iface);
+	if (e) {
+		eth_addr_t eth_addr;
+		if (eth_get(e, &eth_addr)) {
+			memcpy(hw_mac, eth_addr.data, ETHER_ADDR_LEN);
+			return EXIT_SUCCESS;
+		}
+	}
+	return EXIT_FAILURE;
+}
 
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__)
 
