@@ -57,7 +57,7 @@ int icmp_echo_make_packet(void *buf, ipaddr_n_t src_ip, ipaddr_n_t dst_ip,
 	icmp_header->icmp_cksum = icmp_checksum((unsigned short *) icmp_header);
 
 	ip_header->ip_sum = 0;
-	ip_header->ip_sum = ip_checksum((unsigned short *) ip_header);
+	ip_header->ip_sum = zmap_ip_checksum((unsigned short *) ip_header);
 
 	return EXIT_SUCCESS;
 }
@@ -122,7 +122,6 @@ int icmp_validate_packet(const struct ip *ip_hdr,
 	if (icmp_idnum != (validation[2] & 0xFFFF)) {
 		return 0;
 	}
-
 	return 1;
 }
 
