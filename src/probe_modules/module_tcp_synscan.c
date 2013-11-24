@@ -52,7 +52,7 @@ int synscan_make_packet(void *buf, ipaddr_n_t src_ip, ipaddr_n_t dst_ip,
 	uint32_t tcp_seq = validation[0];
 
 	ip_header->ip_src.s_addr = src_ip;
-	ip_header->ip_src.s_addr = dst_ip;
+	ip_header->ip_dst.s_addr = dst_ip;
 
 	tcp_header->th_sport = htons(get_src_port(num_ports,
 				probe_num, validation));
