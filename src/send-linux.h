@@ -4,12 +4,14 @@
 #include "../lib/includes.h"
 #include <sys/ioctl.h>
 
+#include <netpacket/packet.h>
+
 #ifdef ZMAP_SEND_BSD_H
 #error "Don't include both send-bsd.h and send-linux.h"
 #endif
 
 // Dummy sockaddr for sendto
-static sockaddr_ll sockaddr;
+static struct sockaddr_ll sockaddr;
 
 
 int get_socket(void)
@@ -60,7 +62,7 @@ int send_run_init(int sock)
 
 int send_packet(int fd, void *buf, int len)
 {
-	return sendto(fd, buf, buf_len, 0, 
+	return sendto(fd, buf, len, 0, 
 		      (struct sockaddr *) &sockaddr,
 		      sizeof(struct sockaddr_ll));
 }
