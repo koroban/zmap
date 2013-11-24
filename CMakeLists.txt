@@ -6,6 +6,13 @@ option(WITH_JSON "Build with support for JSON" OFF)
 option(ENABLE_DEVELOPMENT "Enable development specific compiler and linker flags" OFF)
 option(ENABLE_HARDENING "Add hardening specific compiler and linker flags" ON)
 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	set(USING_CLANG "YES")
+else()
+	set(USING_GCC "YES")
+endif()
+
+
 if(ENABLE_DEVELOPMENT)
 	# Hardening and warnings for building with gcc
 	# Maybe add -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations
@@ -29,7 +36,11 @@ endif()
 
 if(ENABLE_HARDENING)
 	set(GCCHARDENING "-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -fstack-protector-all -fwrapv -fPIC --param ssp-buffer-size=1")
-	set(LDHARDENING "-z relro -z now")
+	if (NOT APPLE)
+		set(LDHARDENING "-z relro -z now")
+	else()
+		set(LDHARDENING "")
+	endif()
 
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${GCCHARDENING}")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LDHARDENING}")
@@ -53,9 +64,13 @@ if(WITH_JSON)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${JSON_CFLAGS}")
 endif()
 
+
+
 # Standard FLAGS
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
+if (NOT APPLE)
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
+endif()
 
 # Extra target FLAGS
 set(CMAKE_C_FLAGS_DEBUG "-O2 -g")
