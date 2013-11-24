@@ -4,6 +4,13 @@
 #ifndef __USE_BSD
 #define __USE_BSD
 #endif
+
+#ifdef __LINUX__
+#include <dumbnet.h>
+#else
+#include <dnet.h>
+#endif
+
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <netinet/ip_icmp.h>

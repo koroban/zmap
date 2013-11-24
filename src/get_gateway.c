@@ -12,7 +12,6 @@
 #include <unistd.h>
 #include <errno.h>
 #include <assert.h>
-#include <dumbnet.h>
 
 #include "../lib/includes.h"
 #include "../lib/logger.h"
