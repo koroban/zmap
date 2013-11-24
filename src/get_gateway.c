@@ -145,9 +145,10 @@ int get_default_gw(struct in_addr *gw, char *iface)
 					log_fatal("get-gateway", "fuck");
 				}
 				if (memcmp(iface, sdl->sdl_data, sdl->sdl_nlen) != 0) {
-					log_fatal("get-gateway", "interface specified does not match "
-							"the interface of the default gateway. You will need "
-							"to manually specify the MAC address of your dateway.");	
+					log_fatal("get-gateway", "interface specified (%s) does not match "
+							"the interface of the default gateway (%.*s). You will need "
+							"to manually specify the MAC address of your dateway.",
+							iface, sdl->sdl_nlen, sdl->sdl_data);	
 				}
 			}
 			if ((1<<i) == RTA_GATEWAY) {
@@ -159,8 +160,6 @@ int get_default_gw(struct in_addr *gw, char *iface)
 		}
 	}
 	close(fd);
-	free(rtm);
-
 	return EXIT_SUCCESS;
 }	
 

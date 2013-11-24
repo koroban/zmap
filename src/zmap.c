@@ -235,7 +235,7 @@ static void start_zmap(void)
 	if (!zconf.gw_mac_set) {
 		struct in_addr gw_ip;
 		char iface[IF_NAMESIZE];
-		if (get_default_gw(&gw_ip, iface) < 0) {
+		if (get_default_gw(&gw_ip, zconf.iface) < 0) {
 			log_fatal("zmap", "could not detect default gateway address for %s."
 					" Try setting default gateway mac address (-G).",
 					zconf.iface);
