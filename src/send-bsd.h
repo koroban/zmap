@@ -14,6 +14,8 @@
 #error "Don't include both send-bsd.h and send-linux.h"
 #endif
 
+#define UNUSED __attribute__((unused))
+
 int get_socket(void)
 {
 	char file[32];
@@ -47,8 +49,13 @@ int get_socket(void)
 	return bpf;
 }
 
-int send_get_src_macaddr(__attribute__((unused)) int fd, 
-			 __attribute__((unused)) struct ifreq *if_mac)
+int send_run_init(UNUSED int sock)
+{
+	// Don't need to do anything on BSD-like variants
+	return 1;
+}
+
+int send_get_src_macaddr(UNUSED int fd, UNUSED struct ifreq *if_mac)
 {
 	// TODO
 	return 0;

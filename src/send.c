@@ -32,6 +32,8 @@
 // OS specific functions called by send_run
 static inline int send_get_src_macaddr(int fd, struct ifreq *if_mac);
 static inline int send_packet(int fd, void *buf, int len);
+static inline int send_run_init(int sock);
+
 
 // Include the right implementations
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__)
@@ -42,20 +44,20 @@ static inline int send_packet(int fd, void *buf, int len);
 
 // Lock to manage access to share send state such as counters and 
 // cyclic group
-pthread_mutex_t send_mutex;
+pthread_mutex_t send_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 // Lock to provide thread safety to the user provided send callback
-pthread_mutex_t syncb_mutex;
+pthread_mutex_t syncb_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 // Globals to handle sending from multiple IP addresses
-uint16_t num_src_ports;
-uint32_t num_addrs;
-in_addr_t srcip_first;
-in_addr_t srcip_last;
+static uint16_t num_src_ports;
+static uint32_t num_addrs;
+static in_addr_t srcip_first;
+static in_addr_t srcip_last;
 
 // Offset send addresses according to a random chose per scan execution
 // in order to help prevent cross-scan interference
-uint32_t srcip_offset;
+static uint32_t srcip_offset;
 
 // global sender initialize (not thread specific)
 int send_init(void)
@@ -168,9 +170,15 @@ int send_run(int sock)
 {
 	log_debug("send", "thread started");
 	pthread_mutex_lock(&send_mutex);
+
 	// Allocate a buffer to hold the outgoing packet
 	char buf[MAX_PACKET_SIZE];
 	memset(buf, 0, MAX_PACKET_SIZE);
+
+	// OS specific per-thread init
+	if (!send_run_init(sock)) {
+		return -1;
+	}
 
 	// Get the source hardware address, and give it to the probe
 	// module
@@ -187,11 +195,6 @@ int send_run(int sock)
 			(unsigned char *) if_mac.ifr_addr.sa_data, 
 			zconf.gw_mac, zconf.target_port);
 #endif /* __LINUX__ */
-	
-	// OS specific init
-	if (!send_run_init(sock)) {
-		return -1;
-	}
 
 	pthread_mutex_unlock(&send_mutex);
 
