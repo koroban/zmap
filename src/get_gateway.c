@@ -13,11 +13,14 @@
 #include <errno.h>
 #include <assert.h>
 
+#include <sys/socket.h>
+#include <net/route.h>
+#include <netinet/in.h>
+
 #include "../lib/includes.h"
 #include "../lib/logger.h"
 
 #define ROUNDUP(a) ((a) > 0 ? (1 + (((a) - 1) | (sizeof(int) - 1))) : sizeof(int))
-
 
 #define UNUSED __attribute__((unused))
 
@@ -72,13 +75,7 @@ int get_iface_hw_addr(char *iface, unsigned char *hw_mac)
 
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__)
 
-#include <unistd.h>
-#include <sys/socket.h>
-#include <net/route.h>
-#include <netinet/in.h>
 #include <net/if_dl.h>
-#include <ctype.h>
-
 
 int get_iface_ip(char *iface, struct in_addr *ip)
 {
@@ -109,10 +106,7 @@ int get_default_gw(struct in_addr *gw, char *iface)
 {
 	int seq = 0x00FF;
 	char buf[4096];
-	//size_t sizeof_buffer = sizeof(struct rt_msghdr) + sizeof(struct sockaddr_in)*16;
-	struct rt_msghdr *rtm = (struct rt_msghdr*) &buf; //malloc(sizeof_buffer);
-	assert(rtm);
-
+	struct rt_msghdr *rtm = (struct rt_msghdr*) &buf;
 	int fd = socket(PF_ROUTE, SOCK_RAW, 0);
 
 	memset(rtm, 0, sizeof(buf));
@@ -158,7 +152,7 @@ int get_default_gw(struct in_addr *gw, char *iface)
 			}
 			if ((1<<i) == RTA_GATEWAY) {
 				struct sockaddr_in *sin = (struct sockaddr_in *) sa;
-				printf("ip address is %s\n", inet_ntoa(sin->sin_addr));
+				gw->s_addr = sin->sin_addr.s_addr; 
 			}
 			// next element
 			sa = (struct sockaddr *)(ROUNDUP(sa->sa_len) + (char *)sa);
