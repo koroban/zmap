@@ -2,6 +2,7 @@
 #define ZMAP_SEND_LINUX_H
 
 #include "../lib/includes.h"
+#include <sys/ioctl.h>
 
 #ifdef ZMAP_SEND_BSD_H
 #error "Don't include both send-bsd.h and send-linux.h"
