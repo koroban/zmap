@@ -23,7 +23,6 @@
 
 int get_hw_addr(struct in_addr *gw_ip, unsigned char *hw_mac)
 {
-	int rc = 0;
 	arp_t *arp;
 	struct arp_entry entry;
 
