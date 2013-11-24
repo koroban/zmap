@@ -29,7 +29,7 @@ static inline unsigned short in_checksum(unsigned short *ip_pkt, int len)
 	return (unsigned short) (~sum);
 }
 
-__attribute__((unused)) static inline unsigned short ip_checksum(
+__attribute__((unused)) static inline unsigned short zmap_ip_checksum(
                 unsigned short *buf)
 {
 	return in_checksum(buf, (int) sizeof(struct ip));
