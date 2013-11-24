@@ -14,10 +14,6 @@
 #include <assert.h>
 #include <string.h>
 
-#include <sys/socket.h>
-#include <net/route.h>
-#include <netinet/in.h>
-
 #include "../lib/includes.h"
 #include "../lib/logger.h"
 
@@ -63,10 +59,14 @@ int get_iface_hw_addr(char *iface, unsigned char *hw_mac)
 	eth_t *e = eth_open(iface);
 	if (e) {
 		eth_addr_t eth_addr;
-		if (eth_get(e, &eth_addr) == 0) {
+		int res = eth_get(e, &eth_addr);
+		log_debug("gateway", "res: %d", res);
+		if (res == 0) {
 			memcpy(hw_mac, eth_addr.data, ETHER_ADDR_LEN);
 			return EXIT_SUCCESS;
 		}
+	} else {
+		fprintf(stderr, "%s\n", "#wat");
 	}
 	return EXIT_FAILURE;
 }
