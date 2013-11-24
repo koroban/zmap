@@ -16,8 +16,10 @@
 #include "../lib/includes.h"
 #include "../lib/logger.h"
 
+#define UNUSED __attribute__((unused))
 
-int get_hw_addr(struct in_addr *gw_ip, char *iface, unsigned char *hw_mac)
+
+int get_hw_addr(struct in_addr *gw_ip, UNUSED char *iface, unsigned char *hw_mac)
 {
 	int rc = 0;
 	arp_t *arp;
@@ -35,8 +37,8 @@ int get_hw_addr(struct in_addr *gw_ip, char *iface, unsigned char *hw_mac)
 	// Convert gateway ip to dnet struct format
 	memset(&entry, 0, sizeof(struct arp_entry));
 	entry.arp_pa.addr_type = ADDR_TYPE_IP;
-    entry.arp_pa.addr_bits = IP_ADDR_BITS;
-    entry.arp_pa.addr_ip = gw_ip->s_addr;
+	entry.arp_pa.addr_bits = IP_ADDR_BITS;
+	entry.arp_pa.addr_ip = gw_ip->s_addr;
 	
 	if (arp_get(arp, &entry) < 0) {
 		log_fatal("get_hw_addr", "failed to fetch arp entry");
@@ -58,7 +60,7 @@ int get_iface_hw_addr(char *iface, unsigned char *hw_mac)
 	eth_t *e = eth_open(iface);
 	if (e) {
 		eth_addr_t eth_addr;
-		if (eth_get(e, &eth_addr)) {
+		if (eth_get(e, &eth_addr) == 0) {
 			memcpy(hw_mac, eth_addr.data, ETHER_ADDR_LEN);
 			return EXIT_SUCCESS;
 		}
@@ -93,7 +95,7 @@ int get_iface_ip(char *iface, struct in_addr *ip)
     return EXIT_FAILURE;
 }
 
-int get_default_gw(struct in_addr *gw, char *iface)
+int get_default_gw(UNUSED struct in_addr *gw, UNUSED char *iface)
 {
 	log_warn("get-default-gw", "not yet implemented on bsd");
 	return EXIT_FAILURE;

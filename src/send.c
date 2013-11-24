@@ -85,6 +85,8 @@ int send_init(void)
 				zconf.source_ip_first);
 	}
 	srcip_last = inet_addr(zconf.source_ip_last);
+	log_debug("send", "srcip_first: %u", srcip_first);
+	log_debug("send", "srcip_last: %u", srcip_last);
 	if (srcip_last == INADDR_NONE) {
 		log_fatal("send", "invalid end source ip address: `%s'",
 				zconf.source_ip_last);
@@ -184,7 +186,7 @@ int send_run(int sock)
 	// module
 	unsigned char hw_mac[ETHER_ADDR_LEN];
 	if (get_iface_hw_addr(zconf.iface, hw_mac)) {
-		log_error("send", "Couldn't get hardware address for"
+		log_fatal("send", "Couldn't get hardware address for"
 			  "interface: %s", zconf.iface);
 		return -1;
 	}
