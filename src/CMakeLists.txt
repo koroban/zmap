@@ -83,9 +83,16 @@ add_custom_command(OUTPUT parser.c
 
 add_executable(zmap ${SOURCES})
 
+if (APPLE)
+	set(DNET_LIBRARIES "dnet")
+else()
+	set(DNET_LIBRARIES "dumbnet")
+endif()
+
 target_link_libraries(
 	zmap 
-	pcap gmp m dumbnet
+	pcap gmp m
+	${DNET_LIBRARIES}
 	${REDIS_LIBS}
 	${JSON_LIBRARIES}
 	)
