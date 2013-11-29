@@ -5,6 +5,11 @@ include_directories(
 	${PROJECT_SOURCE_DIR}/src/output_modules
 	)
 
+if (APPLE)
+	include_directories(/opt/local/include)
+	link_directories(/opt/local/lib)
+endif()
+
 SET(LIB_SOURCES
 	${PROJECT_SOURCE_DIR}/lib/blacklist.c
 	${PROJECT_SOURCE_DIR}/lib/constraint.c

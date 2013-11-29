@@ -29,7 +29,6 @@ if(ENABLE_DEVELOPMENT)
 
 	# Fix line breaks
 	string(REPLACE ";" " "  GCCWARNINGS "${GCCWARNINGS}")
-
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${GCCWARNINGS} -g")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -g")
 endif()
@@ -73,7 +72,7 @@ if (NOT APPLE)
 endif()
 
 # Extra target FLAGS
-set(CMAKE_C_FLAGS_DEBUG "-O2 -g")
+set(CMAKE_C_FLAGS_DEBUG "-g")
 set(CMAKE_C_FLAGS_RELEASE "-O2")
 
 add_subdirectory(src)
