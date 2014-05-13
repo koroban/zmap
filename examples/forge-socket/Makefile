@@ -13,9 +13,12 @@ CFLAGS+=$(GCCHARDENING)
 LDFLAGS+=$(LDHARDENING)
 
 
-all: forge-socket
+all: forge-socket forge-socket-ssh
 
 forge-socket: forge-socket.o xalloc.o logger.o
+	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+
+forge-socket-ssh: forge-socket-ssh.o xalloc.o logger.o
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 clean:
