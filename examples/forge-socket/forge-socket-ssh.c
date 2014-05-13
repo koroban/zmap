@@ -1,6 +1,6 @@
 /*
- * Forge Socket Banner Grab Copyright 2013 Regents of the University of Michigan 
- * 
+ * Forge Socket Banner Grab Copyright 2013 Regents of the University of Michigan
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy
  * of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -71,15 +71,15 @@ void print_status(evutil_socket_t fd, short events, void *arg)
 	evtimer_add(ev, &status_timeout);
 	(void)fd; (void)events;
 
-	log_info("forge-socket", "(%d/%d in use) - Totals: %d inited, %d connected, %d conn timeout, %d read timeout %d completed", 
-			conf->current_running, conf->max_concurrent, 
+	log_info("forge-socket", "(%d/%d in use) - Totals: %d inited, %d connected, %d conn timeout, %d read timeout %d completed",
+			conf->current_running, conf->max_concurrent,
 			conf->stats.init_connected_hosts,
-			conf->stats.connected_hosts, conf->stats.conn_timed_out, 
+			conf->stats.connected_hosts, conf->stats.conn_timed_out,
 			conf->stats.read_timed_out, conf->stats.completed_hosts);
 }
 
 void decrement_cur_running(struct state *st)
-{	
+{
 	struct config *conf = st->conf;
 	conf->current_running--;
 	log_debug("forge-socket", "done, down to %d",
@@ -106,7 +106,7 @@ void event_cb(struct bufferevent *bev, short events, void *arg)
 	addr.s_addr = st->src_ip;
 	if (events & BEV_EVENT_CONNECTED) {
 		log_error("forge-socket", "%s connected - wat?", inet_ntoa(addr));
-	
+
 	} else {
 		if (st->state == CONNECTED) {
 			// Print out that we just didn't receive data
@@ -144,7 +144,7 @@ void read_cb(struct bufferevent *bev, void *arg)
 	}
 
 	if (len > 0) {
-		// Grab the banner	
+		// Grab the banner
 		unsigned int i;
 		unsigned char *buf = malloc(len+1);
 
@@ -155,7 +155,7 @@ void read_cb(struct bufferevent *bev, void *arg)
 			return;
 		}
 		evbuffer_remove(in, buf, len);
-		
+
 		printf("%s ", inet_ntoa(addr));
 
 		if (st->conf->format == FORMAT_ASCII) {
@@ -174,11 +174,11 @@ void read_cb(struct bufferevent *bev, void *arg)
 			char out[4] = {0,0,0,0};
 			while (i < len) {
 				uint32_t value = 0;
-				value += (i < len) ? buf[i++] << 16 : 0; 	
+				value += (i < len) ? buf[i++] << 16 : 0;
 				value += (i < len) ? buf[i++] <<  8 : 0;
 				value += (i < len) ? buf[i++]       : 0;
 				out[0] = BASE64_ALPHABET[(value >> 18) & 0x3F];
-				out[1] = BASE64_ALPHABET[(value >> 12) & 0x3F];                                                                           
+				out[1] = BASE64_ALPHABET[(value >> 12) & 0x3F];
 				out[2] = BASE64_ALPHABET[(value >>  6) & 0x3F];
 				out[3] = BASE64_ALPHABET[(value      ) & 0x3F];
 				if (i < len) {
@@ -257,7 +257,7 @@ void grab_banner(struct state *st)
     }
 
     memset(&tcp_st, 0, sizeof(tcp_st));
-    
+
     // These need to be in network order for forge socket"
     tcp_st.src_ip = st->dst_ip;
     tcp_st.dst_ip = st->src_ip;
@@ -270,7 +270,7 @@ void grab_banner(struct state *st)
 
     tcp_st.snd_wnd = 0x1000;
     tcp_st.rcv_wnd = 0x1000;
-    
+
     tcp_st.snd_una = tcp_st.seq;
 	st->state = CONNECTING;
 	st->conf->stats.init_connected_hosts++;
@@ -299,8 +299,8 @@ void grab_banner(struct state *st)
 		// and allow null characters
 		evbuffer_add_printf(evout, st->conf->send_str,
 				inet_ntoa(addr.sin_addr), inet_ntoa(addr.sin_addr),
-                inet_ntoa(addr.sin_addr), inet_ntoa(addr.sin_addr));	
-        log_trace("forge-socket", "sent str to %s", inet_ntoa(addr.sin_addr)); 
+                inet_ntoa(addr.sin_addr), inet_ntoa(addr.sin_addr));
+        log_trace("forge-socket", "sent str to %s", inet_ntoa(addr.sin_addr));
 	}
 
 	// Update state/stats
@@ -314,15 +314,15 @@ void stdin_eventcb(struct bufferevent *bev, short events, void *ptr) {
 	struct config *conf = ptr;
 
 	if (events & BEV_EVENT_EOF) {
-		log_debug("forge-socket", 
+		log_debug("forge-socket",
 				  "received EOF; quitting after buffer empties");
-		conf->stdin_closed = 1; 
+		conf->stdin_closed = 1;
 		if (conf->current_running == 0) {
 			log_info("forge-socket", "done");
 			print_status(0, 0, conf);
 			exit(0);
 		}
-	} 
+	}
 }
 
 void stdin_readcb(struct bufferevent *bev, void *arg)
@@ -330,10 +330,10 @@ void stdin_readcb(struct bufferevent *bev, void *arg)
 	struct evbuffer *in = bufferevent_get_input(bev);
 	struct config *conf = arg;
 
-	log_debug("forge-socket", "stdin cb %d < %d ?", 
+	log_debug("forge-socket", "stdin cb %d < %d ?",
 		conf->current_running, conf->max_concurrent);
 
-	while (conf->current_running < conf->max_concurrent && 
+	while (conf->current_running < conf->max_concurrent &&
 		   evbuffer_get_length(in) > 0) {
 		size_t line_len;
 		char *line = evbuffer_readln(in, &line_len, EVBUFFER_EOL_LF);
@@ -365,7 +365,7 @@ void stdin_readcb(struct bufferevent *bev, void *arg)
             st->dport = dport;
             st->seq = seq;
             st->seq_ack = seq_ack;
-		
+
 		    conf->current_running++;
 		    grab_banner(st);
         }
@@ -473,7 +473,7 @@ int main(int argc, char *argv[])
 				log_fatal("forge-socket", "Couldn't read from send data file '%s':", optarg);
 			}
 			conf.send_str[conf.send_str_size] = '\0';
-			fclose(fp);	
+			fclose(fp);
 			break;
 		case '?':
 			printf("Usage:\n");
@@ -485,7 +485,7 @@ int main(int argc, char *argv[])
 			break;
 		}
 	}
-	
+
 	log_info("forge-socket", "Using max_concurrency %d, %d s read timeout",
 			conf.max_concurrent, conf.read_timeout);
 
